@@ -16,7 +16,13 @@ namespace DSA_Assignment1
         public string firstName { get; set; }
         public string lastName { get; set; }
         public int studentNumber { get; set; }
-        public float studentScore { get; set; }
+        public int studentScore { get; set; }
+
+
+        public void learn()
+        {
+            // code
+        }
 
     }
 }

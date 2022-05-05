@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 
 namespace DSA_Assignment1
 {
+    // Known bugs:
+    //  1.Name for students can be left blank a.k.a null or a number can be given
+    //  2.Student score and student number can be input as negative number
+    //  3.Achieving complete unbreakability of the code is slowly destroying my sanity
     internal class Program
     {
         static void Main(string[] args)
@@ -32,6 +36,8 @@ namespace DSA_Assignment1
                 }
             }
             CustomDataList list = new CustomDataList(length);
+            list.firstStudent = null;
+            list.lastStudent=null;
 
             if (length > 0)
             {
@@ -51,10 +57,14 @@ namespace DSA_Assignment1
                     "5. Remove student by index.\n" +
                     "6. Remove first student in list.\n" +
                     "7. Remove last student in list.\n" +
+                    "8. Sort the list of students.\n" +
+                    "9. Display the student with best score.\n" +
+                    "10. Display the student with worst score.\n" + 
                     "0. Exit program.\n\n"
                     );
 
                 input = validateInput(input, "Given command is invalid. Please try again.");
+
 
 
                 switch (input)
@@ -116,6 +126,14 @@ namespace DSA_Assignment1
                         break;
 
                     case 4:
+                        if (list.checkIfStudentsExist()==false)
+                        {
+                            Console.Clear();
+                            Console.WriteLine("There are no students available. Please add students first.");
+                            Console.ReadLine();
+                            break;
+                        }
+
                         bool isInRangeCase4 = false;
                         int indexGet = 0;
                         int indexCase4 = 0;
@@ -129,17 +147,17 @@ namespace DSA_Assignment1
                         else
                         {
                             Student studentCase4 = new Student();
-                            Console.WriteLine($"Please enter the wanted students index. (current possible index range is: 1 - {list.Length}");
+                            Console.WriteLine($"Please enter the wanted students index. (current possible index range is: 1 - {list.LastStudentIndex}");
                             while (isInRangeCase4 == false)
                             {
                                 indexCase4 = validateInput(indexGet, "given Index is not an integer. Please try again.");
-                                if (indexCase4 > 0 && indexCase4 <= list.Length)
+                                if (indexCase4 > 0 && indexCase4 <= list.LastStudentIndex)
                                 {
                                     isInRangeCase4 = true;
                                 }
                                 else
                                 {
-                                    Console.WriteLine($"Given index is not between the possible range: 1 - {list.Length}");
+                                    Console.WriteLine($"Given index is not between the possible range: 1 - {list.LastStudentIndex}");
                                 }
                             }
 
@@ -151,6 +169,14 @@ namespace DSA_Assignment1
                         break;
 
                     case 5:
+                        if (list.checkIfStudentsExist() == false)
+                        {
+                            Console.Clear();
+                            Console.WriteLine("There are no students available. Please add students first.");
+                            Console.ReadLine();
+                            break;
+                        }
+
                         if (listHasSlots == false)
                         {
                             Console.Clear();
@@ -163,24 +189,24 @@ namespace DSA_Assignment1
                             int indexRemove = 0;
                             int indexCase5 = 0;
                             Console.Clear();
-                            Console.WriteLine($"Please enter students index that must be removed. (current possible index range is: 1 - {list.Length}");
+                            Console.WriteLine($"Please enter students index that must be removed. (current possible index range is: 1 - {list.LastStudentIndex}");
 
                             while (isInRangeCase5 == false)
                             {
                                 indexCase5 = validateInput(indexRemove, "given Index is not an integer. Please try again.");
-                                if (indexCase5 > 0 && indexCase5 <= list.Length)
+                                if (indexCase5 > 0 && indexCase5 <= list.LastStudentIndex)
                                 {
                                     isInRangeCase5 = true;
                                 }
                                 else
                                 {
-                                    Console.WriteLine($"Given index is not between the possible range: 1 - {list.Length}");
+                                    Console.WriteLine($"Given index is not between the possible range: 1 - {list.LastStudentIndex}");
                                 }
                             }
 
                             list.RemoveByIndex(indexCase5 - 1);
                             Console.WriteLine("Student terminated successfuly...   (Press enter to continue)");
-                            if(list.Length == 0)
+                            if(list.LastStudentIndex == 0)
                             {
                                 listHasSlots = false;
                             }
@@ -189,6 +215,14 @@ namespace DSA_Assignment1
                         break;
 
                     case 6:
+                        if (list.checkIfStudentsExist() == false)
+                        {
+                            Console.Clear();
+                            Console.WriteLine("There are no students available. Please add students first.");
+                            Console.ReadLine();
+                            break;
+                        }
+
                         if (listHasSlots == false)
                         {
                             Console.Clear();
@@ -200,7 +234,7 @@ namespace DSA_Assignment1
                             Console.Clear();
                             Console.WriteLine($"Removed first student: {list.firstStudent.firstName} {list.firstStudent.lastName}");
                             list.RemoveFirst();
-                            if (list.Length == 0)
+                            if (list.LastStudentIndex == 0)
                             {
                                 listHasSlots = false;
                             }
@@ -210,6 +244,22 @@ namespace DSA_Assignment1
                         break;
 
                     case 7:
+                        if (list.checkIfStudentsExist() == false)
+                        {
+                            Console.Clear();
+                            Console.WriteLine("There are no students available. Please add students first.");
+                            Console.ReadLine();
+                            break;
+                        }
+
+                        if (list.lastStudent == null)
+                        {
+                            Console.Clear();
+                            Console.WriteLine("There is no last student available.");
+                            Console.ReadLine();
+                            break;
+                        }
+
                         if (listHasSlots == false)
                         {
                             Console.Clear();
@@ -221,13 +271,83 @@ namespace DSA_Assignment1
                             Console.Clear();
                             Console.WriteLine($"Removed last student: {list.lastStudent.firstName} {list.lastStudent.lastName}");
                             list.RemoveLast();
-                            if (list.Length == 0)
+                            if (list.LastStudentIndex == 0)
                             {
                                 listHasSlots = false;
                             }
                             Console.WriteLine("Press enter to continue.");
                             Console.ReadLine();
                         }
+                        break;
+
+                    case 8:
+
+                        if (list.LastStudentIndex<2)
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Not enough students to sort.");
+                            Console.ReadLine();
+                            break;
+                        }
+
+                        int inputSort=0; 
+                        bool validInput=false;
+
+                        Console.Clear();
+                        Console.WriteLine("Please choose sorting method:\n" +
+                            "1. Sort by name alphabetically.\n" +
+                            "2. Sort by average score.\n");
+
+                        while (validInput == false)
+                        {
+                            inputSort = validateInput(inputSort, "Please enter either 1 or 2.");
+                            
+                            if (inputSort == 1)
+                            {
+                                list.BubbleSortName();
+                                validInput = true;
+                            }
+                            else if(inputSort == 2)
+                            {
+                                validInput = true;
+                                list.BubbleSortScore();
+                            }
+                            else
+                            {
+                                Console.WriteLine("Please enter 1 or 2.");
+                            }
+                        }
+
+                        Console.WriteLine("List of students is sorted.");
+                        Console.ReadLine();
+                        break;
+
+                    case 9:
+                        list.getFirstScore();
+                        if (list.bestScore == null)
+                        {
+                            Console.Clear();
+                            Console.WriteLine("There are no students in the list.");
+                            Console.ReadLine();
+                            break;
+                        }
+                        Console.Clear();
+                        Console.WriteLine($"The student with best score is: {list.bestScore.firstName} {list.bestScore.lastName} with score: {list.bestScore.studentScore}.");
+                        Console.ReadLine();
+                        break;
+
+                    case 10:
+                        list.getLastScore();
+                        if(list.worstScore == null)
+                        {
+                            Console.Clear();
+                            Console.WriteLine("There are no students in the list.");
+                            Console.ReadLine();
+                            break;
+                        }
+                        Console.Clear();
+                        Console.WriteLine($"The student with worst score is: {list.worstScore.firstName} {list.worstScore.lastName} with score: {list.worstScore.studentScore}.");
+                        Console.ReadLine();
                         break;
 
                     case 0:
@@ -266,6 +386,8 @@ namespace DSA_Assignment1
             }
             return input;
         }
+
+        
        
     }
 

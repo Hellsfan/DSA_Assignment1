@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,23 +7,36 @@ using System.Threading.Tasks;
 
 namespace DSA_Assignment1
 {
-    internal class CustomDataList
+    internal class CustomDataList : IComparer<Student>
     {
+        public int Compare(Student x, Student y)
+        {
+            return x.firstName.CompareTo(y.firstName);
+        }
+        
+        public int CompareLName(Student x, Student y)
+        {
+            return x.lastName.CompareTo(y.lastName);
+        }
+
+
         private string[] firstNames = new string[7] { "Ivan", "Georgi", "Ronaldo", "Donald", "Mickey", "Goofy", "Zoro" };
         private string[] lastNames = new string[7] { "Petrov", "Mouse", "Duck", "Messi", "Roger", "Ibrahimovic", "Uzumaki" };
         Random random = new Random();
         public Student[] arrayOfStudents;
 
-        public int Length = 0;
-       
+        public int LastStudentIndex = 0;
+
         public Student firstStudent { get; set; }
         public Student lastStudent { get; set; }
+        public Student bestScore  { get; set; }
+        public Student worstScore { get; set; }
 
 
         public CustomDataList(int _length)
         {
             arrayOfStudents = new Student[_length];
-            
+
         }
 
 
@@ -32,27 +46,27 @@ namespace DSA_Assignment1
 
         public void PopulateData()
         {
-            int filledSpots = Length;
-            for (int i = 0; i < arrayOfStudents.Length-filledSpots; i++)
+            int filledSpots = LastStudentIndex;
+            for (int i = 0; i < arrayOfStudents.Length - filledSpots; i++)
             {
 
-                arrayOfStudents[i+filledSpots] = new Student()
+                arrayOfStudents[i + filledSpots] = new Student()
                 {
                     firstName = firstNames[random.Next(0, 7)],
                     lastName = lastNames[random.Next(0, 7)],
                     studentNumber = i + 1,
-                    studentScore = (float)random.Next(0, 100)
+                    studentScore = (int)random.Next(0, 100)
                 };
 
-                Length++;
+                LastStudentIndex++;
             }
             firstStudent = arrayOfStudents[0];
-            lastStudent = arrayOfStudents[arrayOfStudents.Length-1];
+            lastStudent = arrayOfStudents[arrayOfStudents.Length - 1];
         }           //Done
 
         public void AddStudent(Student student)
         {
-            if (arrayOfStudents.Length == Length)
+            if (arrayOfStudents.Length == LastStudentIndex)
             {
                 Student[] resizedArray = new Student[arrayOfStudents.Length + 1];
 
@@ -61,8 +75,8 @@ namespace DSA_Assignment1
                 arrayOfStudents = resizedArray;
             }
 
-            arrayOfStudents[Length] = student;
-            Length++;
+            arrayOfStudents[LastStudentIndex] = student;
+            LastStudentIndex++;
 
             firstStudent = arrayOfStudents[0];
             lastStudent = arrayOfStudents[arrayOfStudents.Length - 1];
@@ -97,7 +111,7 @@ namespace DSA_Assignment1
             {
                 arrayOfStudents[index] = null;
                 rearangeAndTrim();
-                Length--;
+                LastStudentIndex--;
 
                 if (arrayOfStudents.Length == 0)
                 {
@@ -119,7 +133,7 @@ namespace DSA_Assignment1
         {
             arrayOfStudents[0] = null;
             rearangeAndTrim();
-            Length--;
+            LastStudentIndex--;
 
             if (arrayOfStudents.Length == 0)
             {
@@ -134,9 +148,10 @@ namespace DSA_Assignment1
         }               //Done
         public void RemoveLast()
         {
-            arrayOfStudents[Length - 1] = null;
+
+            arrayOfStudents[arrayOfStudents.Length - 1] = null;
             rearangeAndTrim();
-            Length--;
+            LastStudentIndex--;
 
             if (arrayOfStudents.Length == 0)
             {
@@ -153,7 +168,7 @@ namespace DSA_Assignment1
         public void DisplayList()
         {
             int counter = 1;
-            Console.WriteLine($"Current Length of list is:{Length}");
+            Console.WriteLine($"Current Length of list is:{LastStudentIndex}");
             foreach (Student student in arrayOfStudents)
             {
                 if (student != null)
@@ -164,6 +179,93 @@ namespace DSA_Assignment1
             }
 
         }       //Done
+
+        public void BubbleSortScore()
+        {
+            int n = LastStudentIndex;
+            for (int i = 0; i < n - 1; i++)
+            {
+                for (int j = 0; j < n - i - 1; j++)
+                {
+                    if (arrayOfStudents[j] != null || arrayOfStudents[j + 1] != null)
+                    {
+                        if (arrayOfStudents[j].studentScore > arrayOfStudents[j + 1].studentScore)
+                        {
+                            // swap temp and arr[i] 
+                            Student temp = arrayOfStudents[j];
+                            arrayOfStudents[j] = arrayOfStudents[j + 1];
+                            arrayOfStudents[j + 1] = temp;
+                        }
+                    }
+                }
+            }
+
+        }
+        
+        public void BubbleSortName()
+        {
+            int n = LastStudentIndex;
+            for (int i = 0; i < n - 1; i++)
+            {
+                for (int j = 0; j < n - i - 1; j++)
+                {
+                    if (arrayOfStudents[j]!=null||arrayOfStudents[j+1]!=null) {
+                        if (Compare(arrayOfStudents[j], arrayOfStudents[j + 1]) == 1)
+                        {
+                            // swap temp and arr[i] 
+
+
+                            Student temp = arrayOfStudents[j];
+                            arrayOfStudents[j] = arrayOfStudents[j + 1];
+                            arrayOfStudents[j + 1] = temp;
+                        }
+                        else if (Compare(arrayOfStudents[j], arrayOfStudents[j + 1]) == 0)
+                        {
+                            if (CompareLName(arrayOfStudents[j], arrayOfStudents[j + 1]) == 1)
+                            {
+                                Student temp = arrayOfStudents[j];
+                                arrayOfStudents[j] = arrayOfStudents[j + 1];
+                                arrayOfStudents[j + 1] = temp;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        public void getFirstScore()
+        {
+            int currentBestScore = 0;
+            for (int i = 0; i < LastStudentIndex; i++)
+            {
+                if (arrayOfStudents[i] != null)
+                {
+                    if (arrayOfStudents[i].studentScore > currentBestScore)
+                    {
+                        currentBestScore = arrayOfStudents[i].studentScore;
+                        bestScore = arrayOfStudents[i];
+                    }
+                }
+            }   
+        }
+        public void getLastScore()
+        {
+            int currentWorstScore = int.MaxValue;
+            for (int i = 0; i < LastStudentIndex; i++)
+            {
+                if (arrayOfStudents[i] != null)
+                {
+                    if (arrayOfStudents[i].studentScore < currentWorstScore)
+                    {
+                        currentWorstScore = arrayOfStudents[i].studentScore;
+                        worstScore = arrayOfStudents[i];
+                    }
+                }
+            }
+            
+        }
+
+
 
         private void rearangeAndTrim()
         {
@@ -188,5 +290,28 @@ namespace DSA_Assignment1
 
 
         }       //Secret method, no need for implement
+
+        public bool checkIfStudentsExist()
+        {
+            bool studentsExist = false;
+
+
+            if (arrayOfStudents.Length == 0)
+            {
+
+            }
+            else
+            {
+                for (int i = 0; i < arrayOfStudents.Length; i++)
+                {
+                    if (arrayOfStudents[i] != null)
+                    {
+                        studentsExist = true;
+                    }
+                }
+            }
+
+            return studentsExist;
+        }
     }
 }
